@@ -4,11 +4,6 @@ from ProblemaDeBusca import *
 
 
 class Buscador(Visualizavel):
-    """
-    retorna um buscador para um problema
-    um caminho é feito se chamando várias vezes o buscador
-    faz busca em profundidade 
-    """
 
     def __init__(self, problema):
         self.problema = problema

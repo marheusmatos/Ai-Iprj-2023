@@ -1,29 +1,28 @@
-
 from visual import Visualizavel, visualize
 from ProblemaDeBusca import *
 
 
-class Buscador(Visualizavel):
+class BuscadorPersonalizado(Visualizavel):
     """
-    retorna um buscador para um problema
-    um caminho é feito se chamando várias vezes o buscador
-    faz busca em profundidade 
+    Esta classe representa um buscador para um problema.
+    Um caminho é formado ao chamar várias vezes o buscador.
+    Realiza a busca em profundidade.
     """
 
     def __init__(self, problema):
         self.problema = problema
-        self.inicializa_fronteira()
+        self.fronteira = []
         self.num_expandidos = 0
-        self.acrescente_a_fronteira(Caminho(problema.no_de_inicio()))
+        self.adicionar_a_fronteira(Caminho(problema.no_de_inicio()))
         super().__init__()
 
-    def inicializa_fronteira(self):
+    def inicializar_fronteira(self):
         self.fronteira = []
 
     def fronteira_vazia(self):
-        return self.fronteira == []
+        return len(self.fronteira) == 0
 
-    def acrescente_a_fronteira(self, caminho):
+    def adicionar_a_fronteira(self, caminho):
         self.fronteira.append(caminho)
 
     @visualize
@@ -36,31 +35,32 @@ class Buscador(Visualizavel):
             self.num_expandidos += 1
             if self.problema.eh_objetivo(caminho.fim()):
                 self.visual(1, self.num_expandidos, "caminhos expandidos e ",
-                            len(self.fronteira), "caminhos restantes na froteira")
+                            len(self.fronteira), "caminhos restantes na fronteira")
                 self.solucao = caminho
                 return caminho
             else:
-                vizi = self.problema.vizin(caminho.fim())
-                self.visual(3, "vizinhos sao ", vizi)
-                for arco in reversed(list(vizi)):
-                    self.acrescente_a_fronteira(Caminho(caminho, arco))
+                vizinhos = self.problema.vizin(caminho.fim())
+                self.visual(3, "vizinhos são ", vizinhos)
+                for arco in reversed(list(vizinhos)):
+                    self.adicionar_a_fronteira(Caminho(caminho, arco))
                 self.visual(3, "Fronteira:", self.fronteira)
-        self.visual(1, "Sem ( mais ) solucoes. Total de",
-                    self.num_expandidos, "caminhos  expandidos.")
+        self.visual(1, "Sem mais soluções. Total de",
+                    self.num_expandidos, "caminhos expandidos.")
 
 
-class BuscaAStar(Buscador):
+class BuscaAStar(BuscadorPersonalizado):
     def custo_total(self, caminho):
         return caminho.custo + self.problema.heuristica(caminho.fim())
 
-    def acrescente_a_fronteira(self, caminho):
+    def adicionar_a_fronteira(self, caminho):
         self.fronteira.append(caminho)
         self.fronteira.sort(key=self.custo_total, reverse=True)
 
+
 if __name__ == "__main__":
-    pesquisando = BuscaAStar(problemaDoAgente)
-    cam1=pesquisando.busca()
-    while cam1!= None:
-        print("--Busca A* - Solucao encontrada:",cam1)
-        cam1=pesquisando.busca()
+    buscador_customizado = BuscaAStar(problemaDoAgente)
+    caminho_atual = buscador_customizado.busca()
+    while caminho_atual is not None:
+        print("--Busca A* - Solução encontrada:", caminho_atual)
+        caminho_atual = buscador_customizado.busca()
     input('\nPRESSIONE "ENTER" PARA SAIR')
